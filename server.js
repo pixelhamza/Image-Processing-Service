@@ -7,9 +7,7 @@ const PORT=process.env.PORT;
 
 app.use(express.json());
 
-app.get('/',(req,res)=>{
-    res.write("Service running");
-    res.end(); 
-})
+// app.use('/images',imageRoutes);
+// app.use('/auth',authRoutes)
 
 app.listen(PORT,()=>console.log("Server Running"));
