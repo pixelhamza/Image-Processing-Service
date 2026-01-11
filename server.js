@@ -9,7 +9,7 @@ const PORT=process.env.PORT || 3000;
 connectToDB();
 
 app.use(express.json());
-// app.use("/api", checkS3);
+app.use("/api", checkS3);
 // app.use('/images',imageRoutes);
 // app.use('/auth',authRoutes)
 
