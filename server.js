@@ -1,6 +1,10 @@
 require('dotenv').config();
 const express=require('express');
 const connectToDB = require('./database/database');
+const imageRoutes=require("./routes/imageRoute");
+const multer=require("multer");
+const storage=multer.memoryStorage();
+const upload=multer({storage});
 
 const checkS3=require("./routes/imageRoute")
 const app=express();
@@ -10,7 +14,7 @@ connectToDB();
 
 app.use(express.json());
 app.use("/api", checkS3);
-// app.use('/images',imageRoutes);
+app.use('/images',imageRoutes);
 // app.use('/auth',authRoutes)
 
 app.listen(PORT,()=>console.log("Server Running"));
