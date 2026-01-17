@@ -1,5 +1,6 @@
 require("dotenv").config(); 
-const{S3Client, PutObjectCommand, S3ServiceException}=require("@aws-sdk/client-s3");
+const{S3Client, PutObjectCommand, S3ServiceException, GetObjectCommand}=require("@aws-sdk/client-s3");
+const {getSignedUrl}=require("@aws-sdk/s3-request-presigner");
 
 const s3=new S3Client({ 
     region:process.env.AWS_REGION,
@@ -20,14 +21,14 @@ const uploadToS3=async(file)=>{
     ContentType: file.mimetype,
     };
 
-    
+
     try{ 
         const command=new PutObjectCommand(uploadParams); //constructing a command
         const data= await s3.send(command); //send the command to the client 
 
         return {
             message:"File uploaded Successfully",
-            imageKey:uploadParams.Key
+            key:uploadParams.Key
      
     }//returning a key to store in the db 
     
@@ -40,6 +41,21 @@ const uploadToS3=async(file)=>{
     }
 }
 
+const getSignedImageUrl=async(key)=>{
+    const command=new GetObjectCommand({  //constructing a get command
+        Bucket:process.env.BUCKET_NAME,
+        Key:key
+    });
 
 
-module.exports={s3,uploadToS3};
+     //get the presigned url 
+    const url=await getSignedUrl(s3,command,{
+        expiresIn:60*5
+    });
+
+    return url; //pass it back to the service
+}
+
+
+
+module.exports={s3,uploadToS3,getSignedImageUrl};
