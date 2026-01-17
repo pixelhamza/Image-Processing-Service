@@ -1,13 +1,14 @@
 const{uploadToS3}=require('../utils/connectToS3');
 const Image=require("../models/Image");
 
-const uploadImage= async(file)=>{ 
-    const ImageURL=await uploadToS3(file); 
+const uploadImage= async(file,userId)=>{ 
+    const imageData=await uploadToS3(file); 
     const image= new Image({ 
-        url:ImageURL.url,
+        userId,
+        imageKey:imageData.key
     })
     await image.save(); 
-    return ImageURL;
+    return imageData;
 
 
 }

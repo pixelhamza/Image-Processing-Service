@@ -11,21 +11,25 @@ const s3=new S3Client({
 })
 
 const uploadToS3=async(file)=>{ 
+
+
     const uploadParams = {
     Bucket: process.env.BUCKET_NAME,
     Key: `${Date.now()}-${file.originalname}`,
     Body: file.buffer,
     ContentType: file.mimetype,
     };
+
+    
     try{ 
         const command=new PutObjectCommand(uploadParams); //constructing a command
         const data= await s3.send(command); //send the command to the client 
 
-        console.log("File uploaded successfully",data);
         return {
-      message: "File uploaded successfully",
-      url: `https://${process.env.BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${uploadParams.Key}`,
-    }//return the url (imp for saving in db)
+            message:"File uploaded Successfully",
+            imageKey:uploadParams.Key
+     
+    }//returning a key to store in the db 
     
 
     }catch(caught){

@@ -2,6 +2,8 @@
 const{ 
     uploadImage
 }=require("../services/imageService");
+
+
 const getImagebyIdController=async(req,res)=>{ 
 
 
@@ -10,7 +12,7 @@ const getImagebyIdController=async(req,res)=>{
 const uploadImageController = async (req, res) => {
   try {
     const file = req.file;
-    // const userId = "testUserId";
+    const userId=req.user.userId;
 
     if (!file) {
       return res.status(400).json({
@@ -19,12 +21,12 @@ const uploadImageController = async (req, res) => {
       });
     }
 
-    const imageData = await uploadImage(file); // returns { message, url }
+    const imageData = await uploadImage(file,userId); // returns { a key }
 
     return res.status(200).json({
       success: true,
       message: "File uploaded successfully",
-      url: imageData.url
+      key:imageData.key
     });
 
   } catch (error) {
