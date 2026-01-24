@@ -1,11 +1,27 @@
 // const { errorResponse, successResponse } = require("../utils/reponse");
 const{ 
-    uploadImage
+    uploadImage,
+    getImage
 }=require("../services/imageService");
 
 
 const getImagebyIdController=async(req,res)=>{ 
+  try{
+  const userId=req.user.userId;
+  const imageId=req.params.id;
 
+  const signedUrl=await getImage(imageId,userId); //pass the imageid and userId to the service layer
+  return res.status(200).json({
+      success: true,
+      url: signedUrl
+    });
+
+  }catch (error) {
+    return res.status(403).json({
+      success: false,
+      message: error.message
+    });
+  }
 
 };
 
