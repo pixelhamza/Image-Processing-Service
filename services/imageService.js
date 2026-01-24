@@ -55,6 +55,34 @@ const deleteImage= async(imageId,userId)=>{
 }
 
 
+const getMyImages = async (userId, page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+
+  const images = await Image.find({ userId })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Image.countDocuments({ userId });
+
+  const imagesWithUrls = await Promise.all(
+    images.map(async (img) => ({
+      id: img._id,
+      url: await getSignedImageUrl(img.imageKey),
+      createdAt: img.createdAt
+    }))
+  );
+
+  return {
+    images: imagesWithUrls,
+    page,
+    limit,
+    total
+  };
+};
+
+
+
 module.exports={ 
     uploadImage,
     getImage,

@@ -50,7 +50,7 @@ const getSignedImageUrl=async(key)=>{
 
      //get the presigned url 
     const url=await getSignedUrl(s3,command,{
-        expiresIn:60*5
+        expiresIn:60*10
     });
 
     return url; //pass it back to the service 
@@ -58,7 +58,7 @@ const getSignedImageUrl=async(key)=>{
 
 const deleteFromS3=async (key)=>{ 
     try{
-    const command=new DeleteObjectCommand({ 
+    const command=new DeleteObjectCommand({ //consstruct a delete command
         Bucket:process.env.BUCKET_NAME,
         Key:key
     });

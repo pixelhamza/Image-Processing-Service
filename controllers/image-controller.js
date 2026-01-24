@@ -2,7 +2,8 @@
 const{ 
     uploadImage,
     getImage,
-    deleteImage
+    deleteImage,
+    getMyImages
 }=require("../services/imageService");
 
 
@@ -60,9 +61,25 @@ const transformImageController= async(req,res)=>{
 
 };
 
-const getMyImagesController=async(req,res)=>{ 
+const getMyImagesController = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const page = parseInt(req.query.page) || 1; //10 images per page
+    const limit = parseInt(req.query.limit) || 10;
 
-}; 
+    const data = await getMyImages(userId, page, limit);
+
+    return res.status(200).json({
+      success: true,
+      ...data
+    });
+
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({success: false,message: "Failed to fetch images"});
+  }
+};
+
 
 const deleteImageController=async(req,res)=>{ 
   try{ 
