@@ -26,11 +26,9 @@ const uploadToS3=async(file)=>{
         const command=new PutObjectCommand(uploadParams); //constructing a command
         const data= await s3.send(command); //send the command to the client 
 
-        return {
-            message:"File uploaded Successfully",
-            key:uploadParams.Key
+        return uploadParams.Key;
      
-    }//returning a key to store in the db 
+    //returning a key to store in the db 
     
 
     }catch(caught){
@@ -69,6 +67,20 @@ const deleteFromS3=async (key)=>{
         throw err;
     }
 }
+
+const getImageBufferFromS3 = async (key) => {
+  const command = new GetObjectCommand({
+    Bucket: process.env.BUCKET_NAME,
+    Key: key
+  });
+
+  const response = await s3.send(command);
+
+  return Buffer.from(
+    await response.Body.transformToByteArray()
+  );
+};
+
 
 
 

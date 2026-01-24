@@ -15,23 +15,23 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 } // 5MB max to prevent load on ram(can be scaled later)
 });
 
-router.get("/check-s3", async (req, res) => {
-  try {
-    await s3.send(
-      new GetBucketLocationCommand({
-        Bucket: process.env.BUCKET_NAME
-      })
-    );
+// router.get("/check-s3", async (req, res) => {
+//   try {
+//     await s3.send(
+//       new GetBucketLocationCommand({
+//         Bucket: process.env.BUCKET_NAME
+//       })
+//     );
 
-    res.json({ ok: true, message: "S3 connection SUCCESS " });
-  } catch (err) {
-    res.status(500).json({
-      ok: false,
-      message: "S3 FAIL ",
-      error: err.name || err.message
-    });
-  }
-});
+//     res.json({ ok: true, message: "S3 connection SUCCESS " });
+//   } catch (err) {
+//     res.status(500).json({
+//       ok: false,
+//       message: "S3 FAIL ",
+//       error: err.name || err.message
+//     });
+//   }
+// });
 router.get('/',auth,getMyImagesController);
 router.get('/:id',auth,getImagebyIdController); 
 router.post('/',auth,upload.single("image"),uploadImageController); 

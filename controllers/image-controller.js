@@ -3,7 +3,8 @@ const{
     uploadImage,
     getImage,
     deleteImage,
-    getMyImages
+    getMyImages,
+    transformImage
 }=require("../services/imageService");
 
 
@@ -39,7 +40,7 @@ const uploadImageController = async (req, res) => {
       });
     }
 
-    const imageKey = await uploadImage(file,userId); // returns { a key }
+    const imageKey = await uploadImage(file,userId); // returns a key 
 
     return res.status(200).json({
       success: true,
@@ -56,10 +57,33 @@ const uploadImageController = async (req, res) => {
   }
 };
 
+const transformImageController = async (req, res) => {
+  try {
+    const imageId = req.params.id;
+    const userId = req.user.userId;
+    const { transformations } = req.body;
 
-const transformImageController= async(req,res)=>{ 
+    if (!transformations) {
+      return res.status(400).json({success: false,message: "Transformations are required"});
+    }
+   
+    const url = await transformImage(imageId, userId, transformations);
 
+    return res.status(200).json({
+      success: true,
+      url
+    });
+
+  } catch (error) {
+    console.error(error.message);
+
+    return res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
 };
+
 
 const getMyImagesController = async (req, res) => {
   try {

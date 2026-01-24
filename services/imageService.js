@@ -1,7 +1,9 @@
 const{uploadToS3,
     getSignedImageUrl,
-    deleteFromS3} = require('../utils/connectToS3');
+    deleteFromS3,
+    getImageBufferFromS3} = require('../utils/connectToS3');
 
+const sharp=require("sharp");
 
 const Image=require("../models/Image");
 
@@ -42,7 +44,6 @@ const deleteImage= async(imageId,userId)=>{
         throw new Error("Unauthorized User");
     }
     await deleteFromS3(image.imageKey);
-    i
     await Image.findByIdAndDelete(imageId);
 
     return true;}
@@ -82,10 +83,87 @@ const getMyImages = async (userId, page = 1, limit = 10) => {
 };
 
 
+const transformImage=async(imageId,userId,transformations)=>{ 
+    const image = await Image.findById(imageId);
+
+  if (!image) {
+    throw new Error("Image not found");
+  }
+
+  if (image.userId.toString() !== userId.toString()) {
+    throw new Error("Unauthorized User");
+  }
+
+  // download the original imagee
+  const originalBuffer = await getImageBufferFromS3(image.imageKey);
+
+  let pipeline = sharp(originalBuffer);//create an instance of the image to work on it
+
+  // transformations
+  if (transformations.resize) {
+    const { width, height } = transformations.resize;
+    pipeline = pipeline.resize(width, height);
+  }
+
+  
+  if (transformations.crop) {
+    const { width, height, x, y } = transformations.crop;
+    pipeline = pipeline.extract({
+      width,
+      height,
+      left: x,
+      top: y
+    });
+  }
+
+
+  if (transformations.rotate) {
+    pipeline = pipeline.rotate(transformations.rotate);
+  }
+
+
+  if (transformations.filters) {
+    if (transformations.filters.grayscale) {
+      pipeline = pipeline.grayscale();
+    }
+
+    if (transformations.filters.sepia) {
+      pipeline = pipeline.sepia();
+    }
+  }
+
+
+  //generate transformed buffer
+  const transformedBuffer = await pipeline.toBuffer();
+
+  //upload transformed image
+  const transformedKey = await uploadToS3({
+    buffer: transformedBuffer,
+    mimetype: `image/jpeg`,
+    originalname: `transformed.jpg`
+  });
+
+   //new image record
+  const newImage = new Image({
+    userId,
+    imageKey: transformedKey,
+    parentImage: image._id,
+    transformations
+  });
+
+  await newImage.save();
+
+  return getSignedImageUrl(transformedKey);
+};
+
+
+
 
 module.exports={ 
     uploadImage,
     getImage,
-    deleteImage
+    getMyImages,
+    deleteImage,
+    transformImage
 }
 
