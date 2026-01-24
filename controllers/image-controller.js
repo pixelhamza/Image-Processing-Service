@@ -38,12 +38,12 @@ const uploadImageController = async (req, res) => {
       });
     }
 
-    const imageData = await uploadImage(file,userId); // returns { a key }
+    const imageKey = await uploadImage(file,userId); // returns { a key }
 
     return res.status(200).json({
       success: true,
       message: "File uploaded successfully",
-      key:imageData.key
+      key:imageKey
     });
 
   } catch (error) {

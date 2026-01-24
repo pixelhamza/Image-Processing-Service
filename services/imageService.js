@@ -6,13 +6,13 @@ const{uploadToS3,
 const Image=require("../models/Image");
 
 const uploadImage= async(file,userId)=>{ 
-    const imageData=await uploadToS3(file); //s3 layer call to handle the uploading 
+    const key=await uploadToS3(file); //s3 layer call to handle the uploading 
     const image= new Image({ 
         userId,
-        imageKey:imageData.key
+        imageKey:key
     })
     await image.save(); //fill the new entry and save
-    return imageData; //pass it back to the controller 
+    return key; //pass it back to the controller 
 
 }
 
