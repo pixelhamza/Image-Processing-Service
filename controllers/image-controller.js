@@ -1,7 +1,8 @@
 // const { errorResponse, successResponse } = require("../utils/reponse");
 const{ 
     uploadImage,
-    getImage
+    getImage,
+    deleteImage
 }=require("../services/imageService");
 
 
@@ -17,7 +18,7 @@ const getImagebyIdController=async(req,res)=>{
     });
 
   }catch (error) {
-    return res.status(403).json({
+    return res.status(400).json({
       success: false,
       message: error.message
     });
@@ -63,9 +64,33 @@ const getMyImagesController=async(req,res)=>{
 
 }; 
 
+const deleteImageController=async(req,res)=>{ 
+  try{ 
+    const imageId=req.params.id; 
+    const userId=req.user.userId;
+
+    await deleteImage(imageId,userId);
+
+    return res.status(200).json({success:true,message: "Image deleted successfully"});
+
+    
+  }catch(error){ 
+    console.error("Error Occured while deleting Image"); 
+
+    if (error.message === "Image not found"){return res.status(404).json({ error: error.message });}
+
+    if (error.message === "Unauthorized user") {return res.status(403).json({ error: error.message });}
+
+    return res.status(500).json({error: "Failed to delete image"});
+
+  }
+
+}
+
 module.exports={ 
     getImagebyIdController,
     uploadImageController,
     transformImageController,
-    getMyImagesController
+    getMyImagesController,
+    deleteImageController
 }

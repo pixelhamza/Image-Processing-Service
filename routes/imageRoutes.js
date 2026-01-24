@@ -3,7 +3,7 @@ const router=express.Router();
 
 const auth = require("../middleware/authMiddleware");
 
-const {getImagebyIdController, uploadImageController, transformImageController, getMyImagesController}=require('../controllers/image-controller');
+const {getImagebyIdController, uploadImageController, transformImageController, getMyImagesController,deleteImageController}=require('../controllers/image-controller');
 const { GetBucketLocationCommand } = require("@aws-sdk/client-s3");
 const {s3} = require("../utils/connectToS3");
 
@@ -36,6 +36,7 @@ router.get('/my',auth,getMyImagesController);
 router.get('/:id',auth,getImagebyIdController); 
 router.post('/',auth,upload.single("image"),uploadImageController); 
 router.post('/:id/transform',auth,transformImageController);
+router.delete('/:id',auth,deleteImageController);
 
 
 

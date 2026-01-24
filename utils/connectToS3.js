@@ -1,5 +1,5 @@
 require("dotenv").config(); 
-const{S3Client, PutObjectCommand, S3ServiceException, GetObjectCommand}=require("@aws-sdk/client-s3");
+const{S3Client, PutObjectCommand, S3ServiceException, GetObjectCommand, DeleteObjectCommand}=require("@aws-sdk/client-s3");
 const {getSignedUrl}=require("@aws-sdk/s3-request-presigner");
 
 const s3=new S3Client({ 
@@ -56,6 +56,20 @@ const getSignedImageUrl=async(key)=>{
     return url; //pass it back to the service 
 }
 
+const deleteFromS3=async (key)=>{ 
+    try{
+    const command=new DeleteObjectCommand({ 
+        Bucket:process.env.BUCKET_NAME,
+        Key:key
+    });
+    await s3.send(command);
+    return true;}
+    catch(err){
+        console.error("S3 delete failed:", err);
+        throw err;
+    }
+}
 
 
-module.exports={s3,uploadToS3,getSignedImageUrl};
+
+module.exports={s3,uploadToS3,getSignedImageUrl,deleteFromS3};

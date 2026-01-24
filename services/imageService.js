@@ -1,4 +1,8 @@
-const{uploadToS3,getSignedImageUrl}=require('../utils/connectToS3');
+const{uploadToS3,
+    getSignedImageUrl,
+    deleteFromS3} = require('../utils/connectToS3');
+
+
 const Image=require("../models/Image");
 
 const uploadImage= async(file,userId)=>{ 
@@ -27,8 +31,33 @@ const getImage=async(imageId,userId)=>{
     return signedUrl; //pass it on to the controller 
 }
 
+const deleteImage= async(imageId,userId)=>{ 
+    try{
+    const image=await Image.findById(imageId);
+    if (!image) {
+      throw new Error("Image not found");
+    }
+    //basic identity check
+    if(image.userId.toString()!==userId){
+        throw new Error("Unauthorized User");
+    }
+    await deleteFromS3(image.imageKey);
+    i
+    await Image.findByIdAndDelete(imageId);
+
+    return true;}
+    
+    catch(err){
+        console.error("Delete image failed:", err.message);
+        throw err;
+
+    }
+}
+
+
 module.exports={ 
     uploadImage,
-    getImage
+    getImage,
+    deleteImage
 }
 
