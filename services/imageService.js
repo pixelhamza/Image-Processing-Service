@@ -4,7 +4,7 @@ const{uploadToS3,
     getImageBufferFromS3} = require('../utils/connectToS3');
 
 const sharp=require("sharp");
-
+const redisClient=require("../utils/redisClient");
 const Image=require("../models/Image");
 
 const uploadImage= async(file,userId)=>{ 
@@ -19,8 +19,13 @@ const uploadImage= async(file,userId)=>{
 }
 
 const getImage=async(imageId,userId)=>{ 
+
+    const cachedImage=await redisClient.get(imageId);
+    if(cachedImage){
+      return JSON.parse(cachedImage);
+    }
     const image=await Image.findById(imageId); //find the image from the image table with that id 
-    
+
     if (!image) {
       throw new Error("Image not found");
     }
@@ -30,6 +35,8 @@ const getImage=async(imageId,userId)=>{
     }
 
     const signedUrl= await getSignedImageUrl(image.imageKey);// s3 layer call to handle the retreival
+
+
     return signedUrl; //pass it on to the controller 
 }
 
@@ -84,6 +91,12 @@ const getMyImages = async (userId, page = 1, limit = 10) => {
 
 
 const transformImage=async(imageId,userId,transformations)=>{ 
+    const cacheKey = `transform:${imageId}:${JSON.stringify(transformations)}:${userId}`; //create a cache key for the image
+
+    const cachedUrl = await redis.get(cacheKey);
+    if (cachedUrl){ return cachedUrl};
+
+
     const image = await Image.findById(imageId);
 
   if (!image) {
@@ -153,7 +166,13 @@ const transformImage=async(imageId,userId,transformations)=>{
 
   await newImage.save();
 
-  return getSignedImageUrl(transformedKey);
+  const signedUrl=await getSignedImageUrl(transformedKey);
+
+  await redis.set(cacheKey,signedUrl,{
+    EX:500
+  })
+
+  return signedUrl;
 };
 
 
