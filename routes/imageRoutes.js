@@ -1,6 +1,7 @@
 const express=require('express');
 const router=express.Router();
 
+const ratelimiter=require("../middleware/ratelimiter")
 const auth = require("../middleware/authMiddleware");
 
 const {getImagebyIdController, uploadImageController, transformImageController, getMyImagesController,deleteImageController}=require('../controllers/image-controller');
@@ -35,7 +36,13 @@ const upload = multer({
 router.get('/',auth,getMyImagesController);
 router.get('/:id',auth,getImagebyIdController); 
 router.post('/',auth,upload.single("image"),uploadImageController); 
-router.post('/:id/transform',auth,transformImageController);
+
+router.post('/:id/transform',auth,ratelimiter({
+    windowSec: 60,
+    maxRequests: 10,
+    keyPrefix: 'rl:transform'
+  }),transformImageController);
+
 router.delete('/:id',auth,deleteImageController);
 
 
