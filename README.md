@@ -41,5 +41,6 @@ The system is designed with scalability in mind, supporting Redis-based caching,
 - Designed to return job-based responses (`202 Accepted`)
 - Improves scalability and request latency
 
-- Task given by https://roadmap.sh/projects/image-processing-service
+
+Task given by https://roadmap.sh/projects/image-processing-service
 
