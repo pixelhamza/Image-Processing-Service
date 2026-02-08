@@ -3,6 +3,8 @@
 A backend service for secure image upload, transformation, and retrieval using AWS S3, presigned URLs, and a scalable architecture designed for future growth.
 
 ---
+
+### System Design
 ![image_alt](https://github.com/pixelhamza/Image-Processing-Service/blob/main/architecture.png)
 ## Description
 
@@ -32,8 +34,8 @@ The system is designed with scalability in mind, supporting Redis-based caching,
 ### Rate Limiting
 - Per-user rate limiting on transformation endpoints
 - Implemented using Redis
-
-### Message Queue (Planned)
+## Future Improvement
+### Message Queue 
 - Architecture supports asynchronous image transformations
 - Transform requests can be processed in background workers
 - Designed to return job-based responses (`202 Accepted`)
