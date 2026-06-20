@@ -42,5 +42,3 @@ The system is designed with scalability in mind, supporting Redis-based caching,
 - Improves scalability and request latency
 
 
-Task given by https://roadmap.sh/projects/image-processing-service
-
